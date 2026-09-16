@@ -19,13 +19,13 @@ function fmtTime(ts) {
 }
 
 const mdComponents = {
-  p: (props) => <p className="mb-2 last:mb-0" {...props} />,
-  h1: (props) => <h1 className="mb-2 mt-3 text-lg font-semibold first:mt-0" {...props} />,
-  h2: (props) => <h2 className="mb-2 mt-3 text-base font-semibold first:mt-0" {...props} />,
-  h3: (props) => <h3 className="mb-1 mt-2 text-sm font-semibold first:mt-0" {...props} />,
-  ul: (props) => <ul className="mb-2 list-disc space-y-1 pl-5" {...props} />,
-  ol: (props) => <ol className="mb-2 list-decimal space-y-1 pl-5" {...props} />,
-  li: (props) => <li className="leading-relaxed" {...props} />,
+  p: (props) => <p className="mb-3 last:mb-0" {...props} />,
+  h1: (props) => <h1 className="mb-2 mt-4 text-lg font-semibold first:mt-0" {...props} />,
+  h2: (props) => <h2 className="mb-2 mt-4 text-base font-semibold first:mt-0" {...props} />,
+  h3: (props) => <h3 className="mb-1.5 mt-3 text-sm font-semibold first:mt-0" {...props} />,
+  ul: (props) => <ul className="mb-3 list-disc space-y-1.5 pl-5" {...props} />,
+  ol: (props) => <ol className="mb-3 list-decimal space-y-1.5 pl-5" {...props} />,
+  li: (props) => <li className="leading-[1.75]" {...props} />,
   a: (props) => (
     <a className="text-sky-600 underline hover:text-sky-500 dark:text-sky-400" target="_blank" rel="noopener noreferrer" {...props} />
   ),
@@ -109,7 +109,7 @@ export default function Message({ msg, isLastAssistant, onRegenerate, loading })
         </svg>
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200">
+        <div className="text-[15px] leading-[1.75] text-neutral-800 dark:text-neutral-200">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
             {text}
           </ReactMarkdown>
