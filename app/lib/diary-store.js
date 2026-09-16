@@ -309,6 +309,215 @@ export async function deleteStudentNoteById(id) {
   return true;
 }
 
+const STUDENT_TASKS_FILE = path.join(DATA_DIR, 'student-tasks.json');
+const STUDENTS_FILE = path.join(DATA_DIR, 'students.json');
+
+// Batas input dashboard murid.
+export const TASK_LIMITS = { name: 50, studentClass: 50, code: 20, title: 200, detail: 2000, progress: 1000 };
+export const TASK_KINDS = [
+  { id: 'jadwal', label: 'Jadwal' },
+  { id: 'konten', label: 'Konten' },
+  { id: 'todo', label: 'To-do' },
+];
+
+function normalizeTaskKind(kind) {
+  return ['jadwal', 'konten', 'todo'].includes(kind) ? kind : 'todo';
+}
+
+function normalizeStudentCode(code) {
+  const c = (code || '').trim().toUpperCase().slice(0, TASK_LIMITS.code);
+  if (!c) throw new Error('Kode murid wajib diisi.');
+  if (!/^[A-Z0-9-]{3,20}$/.test(c)) throw new Error('Kode murid hanya boleh huruf, angka, dan strip (3-20 karakter).');
+  return c;
+}
+
+// ---------- DASHBOARD MURID ----------
+
+export async function upsertStudent({ name, studentClass, code }) {
+  const n = (name || '').trim().slice(0, TASK_LIMITS.name);
+  const c = (studentClass || '').trim().slice(0, TASK_LIMITS.studentClass);
+  const cd = normalizeStudentCode(code);
+  if (!n) throw new Error('Nama murid wajib diisi.');
+  if (isSupabaseConfigured()) {
+    const sb = getSupabaseServer();
+    const { data: existing } = await sb.from('students').select('id').eq('code', cd).limit(1);
+    if (existing && existing.length > 0) {
+      const { data, error } = await sb
+        .from('students')
+        .update({ name: n, class: c })
+        .eq('id', existing[0].id)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    }
+    const { data, error } = await sb
+      .from('students')
+      .insert({ name: n, class: c, code: cd })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
+  }
+  const all = await readJson(STUDENTS_FILE, []);
+  const idx = all.findIndex((s) => s.code === cd);
+  if (idx >= 0) {
+    all[idx] = { ...all[idx], name: n, class: c };
+    await writeJson(STUDENTS_FILE, all);
+    return all[idx];
+  }
+  const row = { id: makeId(), name: n, class: c, code: cd, created_at: nowIso() };
+  all.push(row);
+  await writeJson(STUDENTS_FILE, all);
+  return row;
+}
+
+export async function listStudents() {
+  if (isSupabaseConfigured()) {
+    const sb = getSupabaseServer();
+    const { data, error } = await sb.from('students').select('*').order('name', { ascending: true });
+    if (error) throw new Error(error.message);
+    return data || [];
+  }
+  const all = await readJson(STUDENTS_FILE, []);
+  return all.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+}
+
+// Kembalikan murid HANYA jika kode cocok (dipakai tiap request halaman murid).
+export async function getStudentByCode({ name, code }) {
+  const cd = normalizeStudentCode(code);
+  const n = (name || '').trim().toLowerCase();
+  if (!n) throw new Error('Nama wajib diisi.');
+  if (isSupabaseConfigured()) {
+    const sb = getSupabaseServer();
+    const { data, error } = await sb.from('students').select('*').eq('code', cd).limit(1);
+    if (error) throw new Error(error.message);
+    const row = (data || [])[0];
+    if (!row || (row.name || '').trim().toLowerCase() !== n) {
+      throw new Error('Nama atau kode murid salah.');
+    }
+    return row;
+  }
+  const all = await readJson(STUDENTS_FILE, []);
+  const row = all.find((s) => s.code === cd && (s.name || '').trim().toLowerCase() === n);
+  if (!row) throw new Error('Nama atau kode murid salah.');
+  return row;
+}
+
+export async function createStudentTask({ studentId, kind, title, detail, date }) {
+  if (!studentId) throw new Error('Murid wajib dipilih.');
+  const t = (title || '').trim().slice(0, TASK_LIMITS.title);
+  if (!t) throw new Error('Judul tugas tidak boleh kosong.');
+  const d = (detail || '').trim().slice(0, TASK_LIMITS.detail);
+  const day = isValidDate(date) ? date : todayLocalDate();
+  const k = normalizeTaskKind(kind);
+  if (isSupabaseConfigured()) {
+    const sb = getSupabaseServer();
+    const { data, error } = await sb
+      .from('student_tasks')
+      .insert({ student_id: studentId, kind: k, title: t, detail: d, date: day })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
+  }
+  const all = await readJson(STUDENT_TASKS_FILE, []);
+  const row = {
+    id: makeId(),
+    student_id: studentId,
+    kind: k,
+    title: t,
+    detail: d,
+    date: day,
+    done: false,
+    done_at: null,
+    progress: '',
+    created_at: nowIso(),
+    updated_at: nowIso(),
+  };
+  all.push(row);
+  await writeJson(STUDENT_TASKS_FILE, all);
+  return row;
+}
+
+export async function listStudentTasks({ studentId = null, kind = null } = {}) {
+  const k = kind ? normalizeTaskKind(kind) : null;
+  if (isSupabaseConfigured()) {
+    const sb = getSupabaseServer();
+    let req = sb.from('student_tasks').select('*').order('date', { ascending: true }).order('created_at', { ascending: true });
+    if (studentId) req = req.eq('student_id', studentId);
+    if (k) req = req.eq('kind', k);
+    const { data, error } = await req;
+    if (error) throw new Error(error.message);
+    return data || [];
+  }
+  const all = await readJson(STUDENT_TASKS_FILE, []);
+  return all
+    .filter((t) => (!studentId || t.student_id === studentId) && (!k || t.kind === k))
+    .sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.created_at || '').localeCompare(b.created_at || ''));
+}
+
+export async function updateStudentTask(id, patch, { verifiedStudentId = null } = {}) {
+  if (!id) throw new Error('ID wajib diisi.');
+  const allowed = {};
+  if (typeof patch.done === 'boolean') allowed.done = patch.done;
+  if (typeof patch.progress === 'string') allowed.progress = patch.progress.trim().slice(0, TASK_LIMITS.progress);
+  // Field coach saja (murid tidak boleh ubah judul/detail/tanggal).
+  if (!verifiedStudentId) {
+    if (typeof patch.title === 'string' && patch.title.trim()) allowed.title = patch.title.trim().slice(0, TASK_LIMITS.title);
+    if (typeof patch.detail === 'string') allowed.detail = patch.detail.trim().slice(0, TASK_LIMITS.detail);
+    if (patch.date && isValidDate(patch.date)) allowed.date = patch.date;
+    if (patch.kind) allowed.kind = normalizeTaskKind(patch.kind);
+  }
+  if (Object.keys(allowed).length === 0) throw new Error('Tidak ada field valid untuk diubah.');
+  if (typeof allowed.done === 'boolean') allowed.done_at = allowed.done ? nowIso() : null;
+  allowed.updated_at = nowIso();
+
+  if (isSupabaseConfigured()) {
+    const sb = getSupabaseServer();
+    let req = sb.from('student_tasks').update(allowed).eq('id', id);
+    // Murid hanya boleh ubah tugas miliknya sendiri.
+    if (verifiedStudentId) req = req.eq('student_id', verifiedStudentId);
+    const { data, error } = await req.select().single();
+    if (error) throw new Error(error.message);
+    return data;
+  }
+  const all = await readJson(STUDENT_TASKS_FILE, []);
+  const idx = all.findIndex((t) => t.id === id && (!verifiedStudentId || t.student_id === verifiedStudentId));
+  if (idx < 0) throw new Error('Tugas tidak ditemukan.');
+  all[idx] = { ...all[idx], ...allowed };
+  await writeJson(STUDENT_TASKS_FILE, all);
+  return all[idx];
+}
+
+export async function deleteStudentTaskById(id) {
+  if (!id) throw new Error('ID wajib diisi.');
+  if (isSupabaseConfigured()) {
+    const sb = getSupabaseServer();
+    const { error } = await sb.from('student_tasks').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+    return true;
+  }
+  const all = await readJson(STUDENT_TASKS_FILE, []);
+  await writeJson(STUDENT_TASKS_FILE, all.filter((t) => t.id !== id));
+  return true;
+}
+
+export async function deleteStudentById(id) {
+  if (!id) throw new Error('ID wajib diisi.');
+  if (isSupabaseConfigured()) {
+    const sb = getSupabaseServer();
+    const { error } = await sb.from('students').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+    return true;
+  }
+  const all = await readJson(STUDENTS_FILE, []);
+  await writeJson(STUDENTS_FILE, all.filter((s) => s.id !== id));
+  const tasks = await readJson(STUDENT_TASKS_FILE, []);
+  await writeJson(STUDENT_TASKS_FILE, tasks.filter((t) => t.student_id !== id));
+  return true;
+}
+
 // ---------- GABUNGAN ----------
 
 export async function getDaily(date) {

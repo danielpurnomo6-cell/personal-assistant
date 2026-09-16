@@ -52,3 +52,40 @@ alter table student_notes enable row level security;
 
 drop policy if exists "public all student_notes" on student_notes;
 create policy "public all student_notes" on student_notes for all using (true) with check (true);
+
+-- Dashboard murid (/murid): murid login pakai kode unik per murid,
+-- melihat jadwal coach + tugas konten + to-do mereka, bisa update progres.
+-- Proteksi utama ada di API (cek kode tiap request), policy mengikuti pola tabel lain.
+create table if not exists students (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  class text not null default '',
+  code text not null unique,
+  created_at timestamptz default now()
+);
+create index if not exists students_code_idx on students(code);
+
+create table if not exists student_tasks (
+  id uuid default gen_random_uuid() primary key,
+  student_id uuid not null references students(id) on delete cascade,
+  kind text not null default 'todo' check (kind in ('jadwal', 'konten', 'todo')),
+  title text not null,
+  detail text not null default '',
+  date date not null default CURRENT_DATE,
+  done boolean not null default false,
+  done_at timestamptz null,
+  progress text not null default '',
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists student_tasks_student_idx on student_tasks(student_id);
+create index if not exists student_tasks_date_idx on student_tasks(date);
+
+alter table students enable row level security;
+alter table student_tasks enable row level security;
+
+drop policy if exists "public all students" on students;
+create policy "public all students" on students for all using (true) with check (true);
+
+drop policy if exists "public all student_tasks" on student_tasks;
+create policy "public all student_tasks" on student_tasks for all using (true) with check (true);
