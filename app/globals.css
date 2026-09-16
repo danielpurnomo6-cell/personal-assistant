@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-google-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-google-sans), "Google Sans", Roboto, Arial, Helvetica, sans-serif;
+}
+
+/* AI Blob: morph + glow + float (murni CSS) */
+@keyframes blob-morph {
+  0%, 100% { border-radius: 42% 58% 61% 39% / 45% 42% 58% 55%; }
+  33% { border-radius: 60% 40% 38% 62% / 55% 60% 40% 45%; }
+  66% { border-radius: 38% 62% 55% 45% / 60% 38% 62% 40%; }
+}
+
+@keyframes blob-glow {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.08); }
+}
+
+@keyframes blob-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes blob-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-blob-morph {
+  border-radius: 42% 58% 61% 39% / 45% 42% 58% 55%;
+  animation: blob-morph 9s ease-in-out infinite;
+}
+
+.animate-blob-glow {
+  animation: blob-glow 4.5s ease-in-out infinite;
+}
+
+.animate-blob-glow-delay {
+  animation: blob-glow 4.5s ease-in-out 1.2s infinite;
+}
+
+.animate-blob-spin-slow {
+  animation: blob-spin 14s linear infinite;
+}
+
+.animate-blob-float {
+  animation: blob-float 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob-morph,
+  .animate-blob-glow,
+  .animate-blob-glow-delay,
+  .animate-blob-spin-slow,
+  .animate-blob-float {
+    animation: none;
+  }
+}
