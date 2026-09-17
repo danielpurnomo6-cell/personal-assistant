@@ -122,12 +122,12 @@ export default function PersonalAssistant() {
   };
 
   const handleLogout = async () => {
+    // SEMENTARA: tidak ada halaman login — cukup signOut lalu refresh.
     try {
       await getSupabaseBrowser().auth.signOut();
     } catch {
-      // abaikan — tetap arahkan ke login
+      // abaikan
     }
-    router.push('/login');
     router.refresh();
   };
 
@@ -214,8 +214,7 @@ export default function PersonalAssistant() {
         data = {};
       }
       if (res.status === 401) {
-        router.push('/login');
-        router.refresh();
+        appendAssistant(cid, `Akses ditolak (${res.status}). ${data.error || 'Coba lagi.'}`);
         return;
       }
       if (!res.ok && !data.error && !data.text) {

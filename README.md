@@ -7,13 +7,15 @@ inbox catatan murid, dan dashboard murid. Dibangun dengan Next.js 16 (App Router
 
 | Rute | Akses | Keterangan |
 | --- | --- | --- |
-| `/` | Coach (login) | Chat AI + widget harian |
-| `/login` | Publik | Login coach (Supabase Auth email+password) |
-| `/catatan` | Coach | Inbox catatan murid + kelola murid & tugas |
-| `/kalender` | Coach | Kalender |
-| `/tentang` | Coach | Profil owner |
+| `/` | Terbuka (sementara) | Chat AI + widget harian |
+| `/catatan` | Terbuka (sementara) | Inbox catatan murid + kelola murid & tugas |
+| `/kalender` | Terbuka (sementara) | Kalender |
+| `/tentang` | Terbuka (sementara) | Profil owner |
 | `/isi-catatan` | Publik (murid) | Form kirim catatan (butuh kode kelas) |
 | `/murid` | Publik (murid) | Dashboard murid (login nama + kode murid) |
+
+> SEMENTARA: halaman login (`/login`) dan seluruh pengaman auth DINONAKTIFKAN
+> atas permintaan owner (akan dibangun ulang). App terbuka tanpa login.
 
 ## Setup
 
@@ -40,14 +42,13 @@ Supabase Dashboard > SQL Editor > New query > Run. File ini idempoten
 (boleh dijalankan ulang). RLS dikunci: hanya `authenticated` yang bisa
 akses tabel langsung; anon ditolak; service role bypass untuk server.
 
-4. Buat akun coach — Supabase Dashboard > Authentication > Users > Add user
-(email + password), lalu:
+4. ~~Buat akun coach~~ (SEMENTARA dinonaktifkan — langsung jalan tanpa login):
 
 ```bash
 npm run dev
 ```
 
-Buka http://localhost:3000/login dan masuk dengan akun tersebut.
+Buka http://localhost:3000 — app langsung terbuka.
 
 ## Model AI
 
@@ -57,17 +58,10 @@ yang teruji: `gemini-3.5-flash`, `gemini-3.5-flash-lite`. Jangan pakai model
 
 ## Keamanan (ringkas)
 
-- Proxy (`proxy.js`): semua halaman privat redirect ke `/login` jika belum
-  login; API privat balas 401 JSON. Publik hanya `/login`, `/isi-catatan`,
-  `/murid`, dan 3 endpoint murid (`POST /api/student-notes`,
-  `GET /api/student-tasks` tanpa `manage`, `PATCH /api/student-tasks/:id`
-  berkode).
-- Route coach (`manage=1`, `POST` tugas, `PATCH/DELETE`) wajib Supabase session
-  via `getSessionUser()` — lapis kedua di balik proxy.
-- Proteksi murid di layer API: `STUDENT_CODE` (form) dan kode per murid
-  (dashboard). Rate-limit in-memory: 10 kiriman / 10 mnt / IP (catatan),
-  30 / 10 mnt (tugas). Catatan: limit ini per-instance — untuk deployment
-  multi-instance/serverless gunakan KV eksternal.
+> SEMENTARA DINONAKTIFKAN: `proxy.js` hanya pass-through, semua API terbuka
+> tanpa login. Jangan share URL publik lebar-lebar sampai auth baru dibangun.
+> Proteksi murid yang masih aktif: `STUDENT_CODE` (form), kode per murid
+> (dashboard), dan rate-limit in-memory.
 
 ## Perintah
 

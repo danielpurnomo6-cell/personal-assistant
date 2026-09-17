@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionUser } from '../../lib/supabase/server';
+// SEMENTARA: cek login dinonaktifkan (auth akan dibangun ulang).
 import {
   getStudentByCode,
   listStudents,
@@ -35,14 +35,7 @@ export async function GET(req) {
   try {
     const params = new URL(req.url).searchParams;
     if (params.get('manage') === '1') {
-      // COACH ONLY: daftar semua murid + tugas.
-      const user = await getSessionUser();
-      if (!user) {
-        return NextResponse.json(
-          { error: 'Unauthorized. Silakan login dulu.' },
-          { status: 401 }
-        );
-      }
+      // SEMENTARA: terbuka tanpa login.
       const students = await listStudents();
       const tasks = await listStudentTasks({});
       return NextResponse.json({ students, tasks, mode: storageMode() });
@@ -70,16 +63,9 @@ export async function GET(req) {
   }
 }
 
-// POST /api/student-tasks — COACH ONLY (wajib login): menambah murid + tugas.
+// POST /api/student-tasks — SEMENTARA terbuka tanpa login: menambah murid + tugas.
 export async function POST(req) {
   try {
-    const user = await getSessionUser();
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Silakan login dulu.' },
-        { status: 401 }
-      );
-    }
     const { name, class: studentClass, code, kind, title, detail, date } = await req.json();
     const student = await upsertStudent({ name, studentClass, code });
     const task = await createStudentTask({ studentId: student.id, kind, title, detail, date });

@@ -1,23 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getSessionUser } from '../../../lib/supabase/server';
 import { markStudentNoteRead, deleteStudentNoteById } from '../../../lib/diary-store';
 
-// COACH ONLY: PATCH & DELETE wajib login via Supabase Auth.
-async function requireCoach() {
-  const user = await getSessionUser();
-  if (!user) {
-    return NextResponse.json(
-      { error: 'Unauthorized. Silakan login dulu.' },
-      { status: 401 }
-    );
-  }
-  return null;
-}
-
+// SEMENTARA: tanpa cek login (auth akan dibangun ulang).
 export async function PATCH(req, { params }) {
   try {
-    const unauthorized = await requireCoach();
-    if (unauthorized) return unauthorized;
     const { id } = await params;
     let isRead = true;
     try {
@@ -36,8 +22,6 @@ export async function PATCH(req, { params }) {
 
 export async function DELETE(_req, { params }) {
   try {
-    const unauthorized = await requireCoach();
-    if (unauthorized) return unauthorized;
     const { id } = await params;
     await deleteStudentNoteById(id);
     return NextResponse.json({ ok: true });

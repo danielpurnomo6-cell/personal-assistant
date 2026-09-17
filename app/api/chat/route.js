@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 import { ownerToPrompt } from '../../lib/owner';
-import { getSessionUser } from '../../lib/supabase/server';
+// SEMENTARA: cek login dinonaktifkan (auth akan dibangun ulang).
 
 const MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 // Fallback otomatis kalau model utama 404 (mis. nama berubah di Google).
@@ -19,15 +19,7 @@ const EFFORT_TO_THINKING = {
 
 export async function POST(req) {
   try {
-    // Private route: wajib login via Supabase Auth.
-    const user = await getSessionUser();
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Silakan login dulu.' },
-        { status: 401 }
-      );
-    }
-
+    // SEMENTARA: tanpa wajib login.
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
         { error: 'GEMINI_API_KEY belum diisi di .env.local.' },
