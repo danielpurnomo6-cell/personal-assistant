@@ -3,7 +3,19 @@ import { createServerClient } from '@supabase/ssr';
 
 // Supabase terikat session user untuk Server Component / Route Handler.
 // WAJIB await: di Next 16, cookies() asynchronous.
+export function isSupabaseAuthConfigured() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+}
+
 export async function getSupabaseServerClient() {
+  if (!isSupabaseAuthConfigured()) {
+    throw new Error(
+      'Supabase auth belum dikonfigurasi. Isi NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY di .env.local.'
+    );
+  }
   const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,

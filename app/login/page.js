@@ -25,7 +25,14 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const supabase = getSupabaseBrowser();
+    let supabase;
+    try {
+      supabase = getSupabaseBrowser();
+    } catch (err) {
+      setError(err?.message || 'Konfigurasi Supabase belum lengkap.');
+      setLoading(false);
+      return;
+    }
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -45,7 +52,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm p-6 bg-[#121215] border border-neutral-800 rounded-2xl shadow-xl space-y-6">
         <div className="space-y-1 text-center">
           <h1 className="text-xl font-semibold tracking-wide">Private Access</h1>
-          <p className="text-xs text-neutral-400">Silakan login dengan akun murid yang telah terdaftar.</p>
+          <p className="text-xs text-neutral-400">Silakan login dengan akun coach yang telah terdaftar.</p>
         </div>
 
         {error && (

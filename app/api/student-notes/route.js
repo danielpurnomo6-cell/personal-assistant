@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getSessionUser } from '../../lib/supabase/server';
 import {
   isValidDate,
   listStudentNotes,
@@ -29,8 +30,16 @@ function isRateLimited(ip) {
 
 // GET /api/student-notes?count=unread — jumlah belum dibaca (untuk badge).
 // GET /api/student-notes?date=YYYY-MM-DD&unreadOnly=1&q=...&limit=... — inbox coach.
+// COACH ONLY: wajib login via Supabase Auth. (POST tetap publik untuk form murid.)
 export async function GET(req) {
   try {
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Silakan login dulu.' },
+        { status: 401 }
+      );
+    }
     const params = new URL(req.url).searchParams;
     if (params.get('count') === 'unread') {
       const unread = await countUnreadStudentNotes();

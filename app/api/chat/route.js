@@ -5,7 +5,9 @@ import { getSessionUser } from '../../lib/supabase/server';
 
 const MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 // Fallback otomatis kalau model utama 404 (mis. nama berubah di Google).
-const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+// WAJIB model yang teruji generateContent + thinkingLevel (Juli 2026):
+// gemini-3.5-flash & gemini-3.5-flash-lite OK; 2.x/1.5 & 2.5-flash 404 untuk key baru.
+const FALLBACK_MODELS = ['gemini-3.5-flash', 'gemini-3.5-flash-lite'];
 const CANDIDATE_MODELS = [...new Set([MODEL, ...FALLBACK_MODELS])];
 
 // Pilihan reasoning effort di UI -> thinkingLevel resmi Gemini 3.
@@ -146,7 +148,7 @@ Tugasmu adalah membantu mengorganisir jadwal harian, memberikan ringkasan tugas,
     }
     if (status === 400 || status === 401 || status === 403) {
       return NextResponse.json(
-        { error: 'API key Gemini tidak valid. Cek GEMINI_API_KEY di .env.local (harus dari AI Studio, format AIza...).' },
+        { error: 'API key Gemini ditolak (401/403). Cek GEMINI_API_KEY di .env.local — ambil key baru dari AI Studio (aistudio.google.com).' },
         { status: 500 }
       );
     }

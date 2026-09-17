@@ -1,13 +1,13 @@
-import { Geist_Mono, Google_Sans } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import BlobCursor from "./components/BlobCursor";
 import "./globals.css";
 
-// Font ala Gemini: Google Sans (brand typeface Google untuk Gemini & produk AI).
-const googleSans = Google_Sans({
-  variable: "--font-google-sans",
+// Font sans utama: Geist (variable font, direkomendasikan docs Next 16).
+// Google Sans adalah brand typeface proprietary dan tidak tersedia di next/font/google.
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
     <html
       lang="id"
       suppressHydrationWarning
-      className={`${googleSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Script id="theme-init" strategy="beforeInteractive">

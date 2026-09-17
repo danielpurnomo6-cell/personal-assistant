@@ -42,46 +42,47 @@ function getTimeInfo() {
 
 export default function PersonalAssistant() {
   const router = useRouter();
-  const [chats, setChats] = useState(() => {
-    if (typeof window === 'undefined') return null;
-    try {
-      return loadChats();
-    } catch {
-      return [];
-    }
-  });
+  // Nilai awal KONSTAN agar render server & hydration pertama identik
+  // (tidak ada hydration mismatch). Nilai persisten dari localStorage
+  // dimuat sekali di efek mount di bawah.
+  const [chats, setChats] = useState(null);
   const [activeId, setActiveId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'dark';
-    try {
-      return loadTheme();
-    } catch {
-      return 'dark';
-    }
-  });
-  const [greet, setGreet] = useState(() => {
-    if (typeof window === 'undefined') return 'Halo';
-    try {
-      return greeting();
-    } catch {
-      return 'Halo';
-    }
-  });
+  const [theme, setTheme] = useState('dark');
+  const [greet, setGreet] = useState('Halo');
   const [providerId, setProviderId] = useState('gemini');
-  const [effort, setEffort] = useState(() => {
-    if (typeof window === 'undefined') return 'medium';
-    try {
-      const e = localStorage.getItem('pa-effort');
-      return ['low', 'medium', 'high'].includes(e) ? e : 'medium';
-    } catch {
-      return 'medium';
-    }
-  });
+  const [effort, setEffort] = useState('medium');
   const abortRef = useRef(null);
   const endRef = useRef(null);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Muat state persisten (localStorage) sekali setelah mount.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- muat sekali dari localStorage setelah mount */
+    try {
+      setChats(loadChats());
+    } catch {
+      setChats([]);
+    }
+    try {
+      setTheme(loadTheme());
+    } catch {
+      // pertahankan default 'dark'
+    }
+    try {
+      setGreet(greeting());
+    } catch {
+      // pertahankan default 'Halo'
+    }
+    try {
+      const e = localStorage.getItem('pa-effort');
+      if (['low', 'medium', 'high'].includes(e)) setEffort(e);
+    } catch {
+      // pertahankan default 'medium'
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
 
   useEffect(() => {
     let cancel = false;

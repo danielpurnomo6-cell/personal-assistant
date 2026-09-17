@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getSessionUser } from '../../../lib/supabase/server';
 import {
   getStudentByCode,
   updateStudentTask,
@@ -24,6 +25,15 @@ export async function PATCH(req, { params }) {
       );
       return NextResponse.json({ task });
     }
+    // Jalur coach (tanpa kode murid): wajib login. Tanpa ini, siapapun bisa
+    // mengubah tugas milik murid mana pun (auth bypass).
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Silakan login dulu.' },
+        { status: 401 }
+      );
+    }
     const task = await updateStudentTask(id, body);
     return NextResponse.json({ task });
   } catch (e) {
@@ -33,6 +43,14 @@ export async function PATCH(req, { params }) {
 
 export async function DELETE(req, { params }) {
   try {
+    // COACH ONLY: hapus tugas / murid wajib login.
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Silakan login dulu.' },
+        { status: 401 }
+      );
+    }
     const { id } = await params;
     const studentOnly = new URL(req.url).searchParams.get('student') === '1';
     if (studentOnly) {
