@@ -9,6 +9,8 @@ import DailyVerse from './components/DailyVerse';
 import { loadChats, saveChats, loadTheme, saveTheme, createChat } from './lib/storage';
 import { PROVIDERS } from './lib/models';
 import { owner } from './lib/owner';
+import { getSupabaseBrowser } from './lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 function greeting() {
   const firstName = (owner.name || '').split(' ')[0] || '';
@@ -39,6 +41,7 @@ function getTimeInfo() {
 }
 
 export default function PersonalAssistant() {
+  const router = useRouter();
   const [chats, setChats] = useState(() => {
     if (typeof window === 'undefined') return null;
     try {
@@ -115,6 +118,16 @@ export default function PersonalAssistant() {
     setTheme(next);
     document.documentElement.classList.toggle('dark', next === 'dark');
     saveTheme(next);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await getSupabaseBrowser().auth.signOut();
+    } catch {
+      // abaikan — tetap arahkan ke login
+    }
+    router.push('/login');
+    router.refresh();
   };
 
   const changeEffort = (v) => {
@@ -198,6 +211,11 @@ export default function PersonalAssistant() {
         data = await res.json();
       } catch {
         data = {};
+      }
+      if (res.status === 401) {
+        router.push('/login');
+        router.refresh();
+        return;
       }
       if (!res.ok && !data.error && !data.text) {
         appendAssistant(cid, `Server error (${res.status}). Coba lagi sebentar.`);
@@ -308,6 +326,14 @@ export default function PersonalAssistant() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
             </svg>
+          </button>
+          <button
+            onClick={handleLogout}
+            aria-label="Logout"
+            title="Logout"
+            className="rounded-full px-2.5 py-1.5 text-xs text-neutral-400 transition hover:bg-neutral-200 hover:text-red-500 dark:hover:bg-zinc-800 dark:hover:text-red-400"
+          >
+            Logout
           </button>
         </header>
 
