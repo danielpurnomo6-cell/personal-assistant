@@ -127,3 +127,22 @@ create policy "coach all student_tasks" on student_tasks
   for all to authenticated
   using (auth.uid() is not null)
   with check (auth.uid() is not null);
+
+-- Token OAuth Google Calendar (satu baris: key='google_tokens').
+-- Hanya server (service role, bypass RLS) yang baca/tulis. Token tidak
+-- pernah dikirim ke browser. Jalankan bagian ini bila memakai integrasi
+-- Google Calendar (/kalender > Hubungkan Google).
+create table if not exists app_settings (
+  key text primary key,
+  value jsonb not null,
+  updated_at timestamptz default now()
+);
+
+alter table app_settings enable row level security;
+
+drop policy if exists "public all app_settings" on app_settings;
+drop policy if exists "coach all app_settings" on app_settings;
+create policy "coach all app_settings" on app_settings
+  for all to authenticated
+  using (auth.uid() is not null)
+  with check (auth.uid() is not null);

@@ -25,7 +25,7 @@ export default function ModelPicker({ providerId, effort, onProviderChange, onEf
         title="Pilih model"
         className="ml-1 flex items-center gap-1.5 rounded-full px-2 py-1 text-xs text-neutral-500 transition hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-800"
       >
-        <span className="h-2 w-2 rounded-full bg-gradient-to-br from-blue-700 to-blue-400" />
+        <span className="h-2 w-2 rounded-full bg-gradient-to-br from-red-900 via-[#ff1e42] to-red-400 shadow-[0_0_8px_rgba(255,30,66,0.7)]" />
         <span className="hidden max-w-[140px] truncate sm:block">{active.model}</span>
         <svg
           viewBox="0 0 24 24"
@@ -60,7 +60,7 @@ export default function ModelPicker({ providerId, effort, onProviderChange, onEf
                     : 'cursor-not-allowed opacity-55'
                 } ${p.id === active.id ? 'bg-neutral-100 dark:bg-neutral-800' : ''}`}
               >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-700 to-blue-400 text-xs font-semibold text-white">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-900 via-[#ff1e42] to-red-500 text-xs font-semibold text-white">
                   {p.name.charAt(0)}
                 </span>
                 <span className="min-w-0 flex-1">
@@ -70,7 +70,7 @@ export default function ModelPicker({ providerId, effort, onProviderChange, onEf
                   </span>
                 </span>
                 {p.id === active.id ? (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4 shrink-0 text-blue-500">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4 shrink-0 text-red-500">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (

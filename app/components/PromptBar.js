@@ -104,7 +104,7 @@ export default function PromptBar({ onSend, loading, onStop, providerId, effort,
   };
 
   return (
-    <div className="rounded-xl border border-neutral-300 bg-white/80 shadow-sm backdrop-blur-md transition focus-within:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900/40 dark:focus-within:border-neutral-700">
+    <div className="rounded-xl border border-red-500/20 bg-[#0a0304]/80 shadow-[0_0_24px_rgba(255,30,66,0.08)] backdrop-blur-md transition focus-within:border-[#ff1e42]/60 focus-within:shadow-[0_0_24px_rgba(255,30,66,0.2)]">
       {attached.length > 0 && (
         <div className="flex flex-wrap gap-2 px-4 pt-3">
           {attached.map((f, i) => (
@@ -134,7 +134,7 @@ export default function PromptBar({ onSend, loading, onStop, providerId, effort,
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className="max-h-[200px] w-full resize-none bg-transparent px-5 pb-1 pt-4 text-[15px] leading-relaxed outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+        className="max-h-[200px] w-full resize-none bg-transparent px-5 pb-1 pt-4 text-[15px] leading-relaxed text-red-50 outline-none placeholder:text-red-200/30"
       />
 
       <div className="flex items-center gap-1 px-3 pb-3">
@@ -142,7 +142,7 @@ export default function PromptBar({ onSend, loading, onStop, providerId, effort,
           onClick={() => fileRef.current?.click()}
           aria-label="Lampirkan file teks"
           title="Lampirkan file teks"
-          className="rounded-full p-2.5 text-blue-600 transition hover:bg-neutral-200 dark:text-blue-400 dark:hover:bg-zinc-800"
+          className="rounded-full p-2.5 text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
             <path strokeLinecap="round" d="M12 5v14M5 12h14" />
@@ -174,8 +174,8 @@ export default function PromptBar({ onSend, loading, onStop, providerId, effort,
             title={listening ? 'Berhenti mendengarkan' : 'Input suara'}
             className={`rounded-full p-2.5 transition ${
               listening
-                ? 'bg-blue-500/15 text-blue-600 animate-pulse dark:text-blue-400'
-                : 'text-blue-600 hover:bg-neutral-200 dark:text-blue-400 dark:hover:bg-zinc-800'
+                ? 'bg-red-500/15 text-red-300 animate-pulse'
+                : 'text-red-400 hover:bg-red-500/10 hover:text-red-300'
             }`}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
@@ -190,7 +190,7 @@ export default function PromptBar({ onSend, loading, onStop, providerId, effort,
             onClick={onStop}
             aria-label="Berhenti"
             title="Berhenti"
-            className="rounded-full bg-blue-600 p-2.5 text-white transition hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-400"
+            className="rounded-full bg-[#ff1e42] p-2.5 text-white shadow-[0_0_16px_rgba(255,30,66,0.5)] transition hover:bg-red-500"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
               <rect x="7" y="7" width="10" height="10" rx="2" />
@@ -202,7 +202,7 @@ export default function PromptBar({ onSend, loading, onStop, providerId, effort,
             disabled={!canSend}
             aria-label="Kirim"
             title="Kirim"
-            className="rounded-full bg-blue-600 p-2.5 text-white transition hover:bg-blue-500 disabled:opacity-30 dark:bg-blue-500 dark:hover:bg-blue-400"
+            className="rounded-full bg-[#ff1e42] p-2.5 text-white shadow-[0_0_16px_rgba(255,30,66,0.5)] transition hover:bg-red-500 hover:shadow-[0_0_22px_rgba(255,30,66,0.65)] disabled:opacity-30 disabled:shadow-none"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-5 w-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m-7 7l7-7 7 7" />

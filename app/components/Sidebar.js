@@ -81,21 +81,19 @@ export default function Sidebar({
         />
       )}
       <aside
-        className={`z-40 flex w-72 shrink-0 flex-col border-r border-neutral-200 bg-white text-neutral-800 transition-transform duration-200 dark:border-neutral-800 dark:bg-zinc-950 dark:text-neutral-200 fixed inset-y-0 left-0 md:static ${
+        className={`z-40 flex w-72 shrink-0 flex-col border-r border-red-500/20 bg-[#0a0304] text-neutral-200 transition-transform duration-200 fixed inset-y-0 left-0 md:static ${
           open ? 'translate-x-0' : '-translate-x-full md:hidden'
         }`}
       >
         <div className="flex items-center gap-2 p-3">
           <span className="flex min-w-0 flex-1 items-center gap-2 px-1 text-[15px] font-medium">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400">
-              <path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4L12 2z" />
-            </svg>
-            <span className="truncate">Personal Assistant</span>
+            <span className="h-2 w-2 shrink-0 rounded-full bg-[#ff1e42] shadow-[0_0_8px_rgba(255,30,66,0.9)] animate-lynn-blink" />
+            <span className="truncate tracking-[0.15em] text-red-100">LYNN</span>
           </span>
           <button
             onClick={onClose}
             aria-label="Tutup menu"
-            className="rounded-full p-2 text-blue-600 transition hover:bg-neutral-200 md:hidden dark:text-blue-400 dark:hover:bg-zinc-800"
+            className="rounded-full p-2 text-red-400 transition hover:bg-red-500/10 md:hidden"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
               <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
@@ -114,13 +112,13 @@ export default function Sidebar({
                 key={l.href}
                 href={l.href}
                 onClick={closeOnMobile}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
                   active
-                    ? 'bg-blue-600/10 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300'
-                    : 'text-neutral-600 hover:bg-neutral-200/70 dark:text-neutral-300 dark:hover:bg-zinc-900/70'
+                    ? 'border-red-500/30 bg-red-500/10 text-red-200 shadow-[0_0_16px_rgba(255,30,66,0.15)]'
+                    : 'border-transparent text-neutral-300 hover:border-red-500/20 hover:bg-red-500/5'
                 }`}
               >
-                <span className={active ? 'text-blue-600 dark:text-blue-400' : 'text-neutral-400 dark:text-neutral-500'}>
+                <span className={active ? 'text-red-400' : 'text-neutral-500'}>
                   {l.icon}
                 </span>
                 <span className="flex-1">{l.label}</span>
@@ -142,7 +140,7 @@ export default function Sidebar({
 
         <div className="px-3 pb-2">
           <div className="relative">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-500 dark:text-blue-400">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-red-400">
               <circle cx="11" cy="11" r="7" />
               <path strokeLinecap="round" d="M20 20l-3.5-3.5" />
             </svg>
@@ -150,7 +148,7 @@ export default function Sidebar({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cari chat"
-              className="w-full rounded-xl bg-neutral-200/70 py-2 pl-9 pr-3 text-sm outline-none placeholder:text-neutral-500 focus:ring-1 focus:ring-neutral-400 dark:bg-zinc-900 dark:placeholder:text-neutral-500 dark:focus:ring-neutral-700"
+              className="w-full rounded-xl border border-red-500/20 bg-red-500/5 py-2 pl-9 pr-3 text-sm text-red-50 outline-none placeholder:text-red-200/30 focus:border-[#ff1e42]/50"
             />
           </div>
         </div>
@@ -161,7 +159,7 @@ export default function Sidebar({
               onNew?.();
               closeOnMobile();
             }}
-            className="flex w-full items-center gap-2 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-neutral-200 dark:border-neutral-800 dark:text-blue-300 dark:hover:bg-zinc-900"
+            className="flex w-full items-center gap-2 rounded-lg border border-[#ef4444]/40 bg-red-500/5 px-3 py-1.5 text-xs font-medium text-red-200 transition hover:border-[#ff1e42] hover:bg-red-500/15 hover:shadow-[0_0_16px_rgba(255,30,66,0.25)]"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5">
               <path strokeLinecap="round" d="M12 5v14M5 12h14" />
@@ -180,10 +178,10 @@ export default function Sidebar({
           {filtered.map((c) => (
             <div
               key={c.id}
-              className={`group flex items-center gap-1 rounded-xl px-2 py-2 text-sm transition ${
+              className={`group flex items-center gap-1 rounded-xl border px-2 py-2 text-sm transition ${
                 c.id === activeId
-                  ? 'bg-neutral-200 dark:bg-zinc-800'
-                  : 'hover:bg-neutral-200/70 dark:hover:bg-zinc-900/70'
+                  ? 'border-red-500/30 bg-red-500/10'
+                  : 'border-transparent hover:border-red-500/20 hover:bg-red-500/5'
               }`}
             >
               <button onClick={() => onSelect(c.id)} className="min-w-0 flex-1 text-left">
@@ -193,7 +191,7 @@ export default function Sidebar({
               <button
                 onClick={() => onDelete(c.id)}
                 aria-label="Hapus chat"
-                className="hidden rounded p-1.5 text-blue-600/60 transition hover:text-blue-600 group-hover:block dark:text-blue-400/70 dark:hover:text-blue-400"
+                className="hidden rounded p-1.5 text-red-400/60 transition hover:text-red-300 group-hover:block"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M10 4h4m-7 3l1 13h8l1-13" />
@@ -204,14 +202,14 @@ export default function Sidebar({
         </div>
 
         {/* Tentang — pinned di bawah */}
-        <div className="border-t border-neutral-200 p-3 dark:border-neutral-800">
+        <div className="border-t border-red-500/20 p-3">
           <Link
             href="/tentang"
             onClick={closeOnMobile}
-            className={`flex items-center gap-3 rounded-xl p-2 transition ${
+            className={`flex items-center gap-3 rounded-xl border p-2 transition ${
               pathname === '/tentang'
-                ? 'bg-blue-600/10 dark:bg-blue-500/15'
-                : 'hover:bg-neutral-200/70 dark:hover:bg-zinc-900/70'
+                ? 'border-red-500/30 bg-red-500/10'
+                : 'border-transparent hover:border-red-500/20 hover:bg-red-500/5'
             }`}
           >
             {owner.photo ? (

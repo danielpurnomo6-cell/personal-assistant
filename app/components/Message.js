@@ -27,7 +27,7 @@ const mdComponents = {
   ol: (props) => <ol className="mb-3 list-decimal space-y-1.5 pl-5" {...props} />,
   li: (props) => <li className="leading-[1.75]" {...props} />,
   a: (props) => (
-    <a className="text-sky-600 underline hover:text-sky-500 dark:text-sky-400" target="_blank" rel="noopener noreferrer" {...props} />
+    <a className="text-red-400 underline hover:text-red-300" target="_blank" rel="noopener noreferrer" {...props} />
   ),
   blockquote: (props) => (
     <blockquote className="mb-2 border-l-2 border-neutral-300 pl-3 italic text-neutral-600 dark:border-neutral-600 dark:text-neutral-400" {...props} />
@@ -88,7 +88,7 @@ export default function Message({ msg, isLastAssistant, onRegenerate, loading })
     return (
       <div className="flex justify-end">
         <div className="max-w-[85%]">
-          <div className="whitespace-pre-wrap rounded-xl border border-neutral-200 bg-neutral-200 px-4 py-3 text-sm leading-relaxed dark:border-neutral-800 dark:bg-zinc-800 dark:text-neutral-100">
+          <div className="whitespace-pre-wrap rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm leading-relaxed text-red-50 shadow-[0_0_20px_rgba(255,30,66,0.08)]">
             {rawContent}
           </div>
           {msg.ts && (
@@ -103,13 +103,11 @@ export default function Message({ msg, isLastAssistant, onRegenerate, loading })
 
   return (
     <div className="flex gap-3">
-      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-800 via-blue-600 to-blue-400">
-        <svg viewBox="0 0 24 24" fill="white" className="h-4 w-4">
-          <path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4L12 2z" />
-        </svg>
+      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#ff1e42]/50 bg-gradient-to-br from-red-950 via-[#ff1e42] to-red-500 shadow-[0_0_14px_rgba(255,30,66,0.5)]">
+        <span className="h-2 w-2 rounded-full bg-white animate-lynn-blink" />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-[15px] leading-[1.75] text-neutral-800 dark:text-neutral-200">
+        <div className="text-[15px] leading-[1.75] text-neutral-200">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
             {text}
           </ReactMarkdown>
@@ -133,10 +131,10 @@ export default function Message({ msg, isLastAssistant, onRegenerate, loading })
             onClick={copy}
             aria-label="Salin jawaban"
             title={copied ? 'Tersalin!' : 'Salin jawaban'}
-            className="rounded p-1.5 text-blue-600 transition hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-zinc-800 dark:hover:text-blue-300"
+            className="rounded p-1.5 text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
           >
             {copied ? (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4 text-blue-500">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4 text-red-400">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             ) : (
@@ -151,7 +149,7 @@ export default function Message({ msg, isLastAssistant, onRegenerate, loading })
               onClick={onRegenerate}
               aria-label="Buat ulang jawaban"
               title="Buat ulang jawaban"
-              className="rounded p-1.5 text-blue-600 transition hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-zinc-800 dark:hover:text-blue-300"
+              className="rounded p-1.5 text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v6h6M20 20v-6h-6M20 9A8 8 0 005.6 5.6L4 7m0 8a8 8 0 0014.4 3.4L20 17" />

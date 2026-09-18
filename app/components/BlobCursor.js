@@ -63,8 +63,8 @@ export default function BlobCursor() {
       aria-hidden="true"
       className="pointer-events-none fixed left-0 top-0 z-[70] opacity-0 transition-opacity duration-300"
     >
-      <div className="absolute -inset-3 rounded-full bg-blue-600/25 blur-xl" />
-      <div className="h-7 w-7 animate-blob-morph bg-[conic-gradient(from_180deg_at_50%_50%,#0a1128,#1e3a8a,#2563eb,#1e1b4b,#0a1128)] opacity-90" />
+      <div className="absolute -inset-3 rounded-full bg-red-600/25 blur-xl" />
+      <div className="h-7 w-7 animate-blob-morph bg-[conic-gradient(from_180deg_at_50%_50%,#080203,#7f1d1d,#ef4444,#ff1e42,#080203)] opacity-90" />
     </div>
   );
 }

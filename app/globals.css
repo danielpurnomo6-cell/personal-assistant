@@ -67,12 +67,82 @@ body {
   animation: blob-float 6s ease-in-out infinite;
 }
 
+/* LYNN // PROTOCOL RED — Crimson HUD animations (murni CSS) */
+@keyframes lynn-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes lynn-spin-reverse {
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes lynn-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.07); }
+}
+
+@keyframes lynn-core {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+@keyframes lynn-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes lynn-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-lynn-spin-slow {
+  animation: lynn-spin 16s linear infinite;
+}
+
+.animate-lynn-spin-fast {
+  animation: lynn-spin 5s linear infinite;
+}
+
+.animate-lynn-spin-reverse {
+  animation: lynn-spin-reverse 11s linear infinite;
+}
+
+.animate-lynn-pulse {
+  animation: lynn-pulse 3.2s ease-in-out infinite;
+}
+
+.animate-lynn-pulse-delay {
+  animation: lynn-pulse 3.2s ease-in-out 0.9s infinite;
+}
+
+.animate-lynn-core {
+  animation: lynn-core 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 30, 66, 0.9));
+}
+
+.animate-lynn-blink {
+  animation: lynn-blink 1.6s ease-in-out infinite;
+}
+
+.animate-lynn-float {
+  animation: lynn-float 6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-blob-morph,
   .animate-blob-glow,
   .animate-blob-glow-delay,
   .animate-blob-spin-slow,
-  .animate-blob-float {
+  .animate-blob-float,
+  .animate-lynn-spin-slow,
+  .animate-lynn-spin-fast,
+  .animate-lynn-spin-reverse,
+  .animate-lynn-pulse,
+  .animate-lynn-pulse-delay,
+  .animate-lynn-core,
+  .animate-lynn-blink,
+  .animate-lynn-float {
     animation: none;
   }
 }

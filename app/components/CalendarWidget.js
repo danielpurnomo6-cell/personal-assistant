@@ -129,7 +129,7 @@ export default function CalendarWidget({ initialYear, initialMonth, onSelect, on
               }`}
             >
               <span className={numCls(d)}>{d}</span>
-              {dotFor(d) && (dotFor(d).hasNote || dotFor(d).todoTotal > 0 || dotFor(d).studentTotal > 0) && (
+              {dotFor(d) && (dotFor(d).hasNote || dotFor(d).todoTotal > 0 || dotFor(d).studentTotal > 0 || dotFor(d).googleCount > 0) && (
                 <span className="mt-1 flex items-center gap-1">
                   {dotFor(d).hasNote && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="Ada jurnal" />}
                   {dotFor(d).todoTotal > 0 && (
@@ -144,6 +144,12 @@ export default function CalendarWidget({ initialYear, initialMonth, onSelect, on
                       title={dotFor(d).studentUnread > 0 ? `${dotFor(d).studentUnread} catatan murid belum dibaca` : 'Catatan murid sudah dibaca'}
                     />
                   )}
+                  {dotFor(d).googleCount > 0 && (
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-rose-500"
+                      title={`${dotFor(d).googleCount} event Google Calendar`}
+                    />
+                  )}
                   {dotFor(d).todoTotal > 0 && (
                     <span className="text-[10px] text-neutral-500 dark:text-neutral-400">
                       {dotFor(d).todoDone}/{dotFor(d).todoTotal}
@@ -152,6 +158,11 @@ export default function CalendarWidget({ initialYear, initialMonth, onSelect, on
                   {dotFor(d).studentUnread > 0 && (
                     <span className="text-[10px] font-medium text-violet-600 dark:text-violet-400">
                       {dotFor(d).studentUnread} murid
+                    </span>
+                  )}
+                  {dotFor(d).googleCount > 0 && (
+                    <span className="text-[10px] font-medium text-rose-600 dark:text-rose-400">
+                      {dotFor(d).googleCount} Google
                     </span>
                   )}
                 </span>
@@ -211,11 +222,12 @@ export default function CalendarWidget({ initialYear, initialMonth, onSelect, on
                 }`}
               >
                 {d}
-                {dotFor(d) && (dotFor(d).hasNote || dotFor(d).todoTotal > 0 || dotFor(d).studentTotal > 0) && (
+              {dotFor(d) && (dotFor(d).hasNote || dotFor(d).todoTotal > 0 || dotFor(d).studentTotal > 0 || dotFor(d).googleCount > 0) && (
                   <span className="absolute -bottom-0.5 flex gap-0.5">
                     {dotFor(d).hasNote && <span className="h-1 w-1 rounded-full bg-emerald-500" />}
                     {dotFor(d).todoTotal > 0 && <span className="h-1 w-1 rounded-full bg-amber-500" />}
                     {dotFor(d).studentUnread > 0 && <span className="h-1 w-1 rounded-full bg-violet-500" />}
+                    {dotFor(d).googleCount > 0 && <span className="h-1 w-1 rounded-full bg-rose-500" />}
                   </span>
                 )}
               </button>

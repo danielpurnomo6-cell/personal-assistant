@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Sidebar from './components/Sidebar';
 import PromptBar from './components/PromptBar';
 import Message from './components/Message';
-import AiBlob from './components/AiBlob';
+import LynnCore from './components/LynnCore';
 import RavineBackground from './components/RavineBackground';
 import DailyVerse from './components/DailyVerse';
 import { loadChats, saveChats, loadTheme, saveTheme, createChat } from './lib/storage';
@@ -39,6 +39,13 @@ function getTimeInfo() {
     period,
   };
 }
+
+const QUICK_ACTIONS = [
+  { label: 'Bantu koding', prompt: 'Bantu saya koding: jelaskan langkahnya dengan jelas dan beri contoh kode.' },
+  { label: 'Rencanakan hariku', prompt: 'Bantu rencanakan hariku hari ini dengan prioritas yang jelas.' },
+  { label: 'Tulis naskah video', prompt: 'Bantu tulis naskah video pendek yang hook-nya kuat di 3 detik pertama.' },
+  { label: 'Brainstorm ide', prompt: 'Beri saya 5 ide kreatif yang bisa saya eksekusi minggu ini.' },
+];
 
 export default function PersonalAssistant() {
   const router = useRouter();
@@ -80,6 +87,12 @@ export default function PersonalAssistant() {
       if (['low', 'medium', 'high'].includes(e)) setEffort(e);
     } catch {
       // pertahankan default 'medium'
+    }
+    try {
+      const pid = localStorage.getItem('pa-provider');
+      if (pid && PROVIDERS.some((x) => x.id === pid && x.available)) setProviderId(pid);
+    } catch {
+      // pertahankan default 'gemini'
     }
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
@@ -143,7 +156,14 @@ export default function PersonalAssistant() {
 
   const changeProvider = (id) => {
     const p = PROVIDERS.find((x) => x.id === id);
-    if (p && p.available) setProviderId(id);
+    if (p && p.available) {
+      setProviderId(id);
+      try {
+        localStorage.setItem('pa-provider', id);
+      } catch {
+        // abaikan
+      }
+    }
   };
 
   const activeChat = (chats || []).find((c) => c.id === activeId) || null;
@@ -201,10 +221,17 @@ export default function PersonalAssistant() {
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     try {
+      const selectedModel = PROVIDERS.find((x) => x.id === providerId)?.model;
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updated, timeInfo: getTimeInfo(), effort }),
+        body: JSON.stringify({
+          messages: updated,
+          timeInfo: getTimeInfo(),
+          effort,
+          providerId,
+          selectedModel,
+        }),
         signal: ctrl.signal,
       });
       let data = {};
@@ -268,14 +295,14 @@ export default function PersonalAssistant() {
 
   if (chats === null) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white text-sm text-neutral-500 dark:bg-zinc-950 dark:text-neutral-400">
-        Memuat...
+      <div className="flex h-screen items-center justify-center bg-[#080203] text-sm text-red-200/70">
+        Menghubungkan ke LYNN...
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-white text-neutral-900 dark:bg-zinc-950 dark:text-neutral-100">
+    <div className="flex h-screen bg-[#080203] text-neutral-100 dark:bg-[#0a0304]">
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -288,23 +315,32 @@ export default function PersonalAssistant() {
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Header */}
-        <header className="flex items-center gap-1 border-b border-neutral-200 bg-white/70 px-3 py-2.5 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-900/40">
+        {/* Header — LYNN // PROTOCOL RED */}
+        <header className="flex items-center gap-1 border-b border-red-500/20 bg-[#0a0304]/80 px-3 py-2.5 backdrop-blur-md">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
             aria-label="Menu"
-            className="rounded-full p-2 text-blue-600 transition hover:bg-neutral-200 dark:text-blue-400 dark:hover:bg-zinc-800"
+            className="rounded-full p-2 text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
               <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           </button>
+          <div className="flex min-w-0 flex-col leading-tight">
+            <span className="truncate text-sm font-semibold tracking-[0.2em] text-red-100">
+              LYNN <span className="text-red-500">{'//'}</span> PROTOCOL RED
+            </span>
+            <span className="flex items-center gap-1.5 text-[11px] font-medium tracking-widest text-red-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#ff1e42] shadow-[0_0_8px_rgba(255,30,66,0.9)] animate-lynn-blink" />
+              SYSTEM ONLINE
+            </span>
+          </div>
           <div className="flex-1" />
           <button
             onClick={toggleTheme}
             aria-label={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
             title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
-            className="rounded-full p-2 text-blue-600 transition hover:bg-neutral-200 dark:text-blue-400 dark:hover:bg-zinc-800"
+            className="rounded-full p-2 text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
           >
             {theme === 'dark' ? (
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
@@ -321,7 +357,7 @@ export default function PersonalAssistant() {
             onClick={newChatBtn}
             aria-label="Chat baru"
             title="Chat baru"
-            className="rounded-full p-1.5 text-blue-600 transition hover:bg-neutral-200 dark:text-blue-400 dark:hover:bg-zinc-800"
+            className="rounded-full p-1.5 text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
@@ -331,24 +367,29 @@ export default function PersonalAssistant() {
             onClick={handleLogout}
             aria-label="Logout"
             title="Logout"
-            className="rounded-full px-2.5 py-1.5 text-xs text-neutral-400 transition hover:bg-neutral-200 hover:text-red-500 dark:hover:bg-zinc-800 dark:hover:text-red-400"
+            className="rounded-full border border-red-500/20 px-2.5 py-1.5 text-xs text-red-300/70 transition hover:bg-red-500/10 hover:text-red-300"
           >
             Logout
           </button>
         </header>
 
         {isLanding ? (
-          <main className="relative flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 pb-10">
-            <RavineBackground className="absolute inset-0 h-full w-full opacity-70 dark:opacity-80" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/60 via-white/30 to-white dark:from-zinc-950/85 dark:via-zinc-950/60 dark:to-zinc-950" />
+          <main className="relative flex flex-1 flex-col items-center justify-center overflow-y-auto bg-[#080203] px-4 pb-10">
+            <RavineBackground className="absolute inset-0 h-full w-full opacity-40" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#080203]/70 via-[#0a0304]/60 to-[#080203]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,30,66,0.12),transparent_60%)]" />
             <div className="relative z-10 flex w-full flex-col items-center">
             <div className="mb-6">
-              <AiBlob />
+              <LynnCore state={loading ? 'loading' : 'idle'} />
             </div>
-            <h1 className="mb-6 bg-gradient-to-r from-blue-500 via-violet-500 to-rose-400 bg-clip-text px-2 text-center text-2xl font-medium text-transparent sm:text-3xl dark:from-blue-400 dark:via-violet-400 dark:to-rose-300">
+            <p className="mb-2 flex items-center gap-1.5 text-[11px] font-medium tracking-[0.3em] text-red-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#ff1e42] shadow-[0_0_8px_rgba(255,30,66,0.9)] animate-lynn-blink" />
+              LYNN {'//'} PROTOCOL RED — SYSTEM ONLINE
+            </p>
+            <h1 className="mb-6 bg-gradient-to-r from-red-200 via-[#ff1e42] to-red-500 bg-clip-text px-2 text-center text-2xl font-medium text-transparent sm:text-3xl">
               {greet}, how can I help you today?
             </h1>
-            <div className="w-full max-w-2xl">
+            <div className="w-full max-w-2xl rounded-2xl border border-red-500/20 bg-[#0a0304]/60 p-1 shadow-[0_0_40px_rgba(255,30,66,0.12)] backdrop-blur-md">
               <PromptBar
                 onSend={(t) => send(t)}
                 loading={loading}
@@ -357,8 +398,20 @@ export default function PersonalAssistant() {
                 effort={effort}
                 onProviderChange={changeProvider}
                 onEffortChange={changeEffort}
-                placeholder="Ask anything..."
+                placeholder="Minta bantuan LYNN..."
               />
+            </div>
+            <div className="mt-4 flex w-full max-w-2xl flex-wrap justify-center gap-2">
+              {QUICK_ACTIONS.map((a) => (
+                <button
+                  key={a.label}
+                  onClick={() => send(a.prompt)}
+                  disabled={loading}
+                  className="rounded-full border border-[#ef4444]/40 bg-red-500/5 px-3.5 py-1.5 text-xs font-medium text-red-200 transition hover:border-[#ff1e42] hover:bg-red-500/15 hover:shadow-[0_0_16px_rgba(255,30,66,0.35)] disabled:opacity-40"
+                >
+                  {a.label}
+                </button>
+              ))}
             </div>
             <div className="mt-6 w-full max-w-2xl">
               <DailyVerse />
@@ -367,7 +420,7 @@ export default function PersonalAssistant() {
           </main>
         ) : (
           <>
-            <main className="flex-1 overflow-y-auto px-4 py-6">
+            <main className="flex-1 overflow-y-auto bg-[#080203] px-4 py-6">
               <div className="mx-auto max-w-3xl space-y-6">
                 {messages.map((m, i) => (
                   <Message
@@ -380,23 +433,21 @@ export default function PersonalAssistant() {
                 ))}
                 {loading && (
                   <div className="flex gap-3">
-                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-violet-500">
-                      <svg viewBox="0 0 24 24" fill="white" className="h-4 w-4">
-                        <path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4L12 2z" />
-                      </svg>
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#ff1e42]/50 bg-gradient-to-br from-red-900 via-[#ff1e42] to-red-500 shadow-[0_0_16px_rgba(255,30,66,0.5)]">
+                      <span className="h-2 w-2 rounded-full bg-white animate-lynn-blink" />
                     </div>
-                    <div className="flex items-center gap-1.5 rounded-2xl px-1 py-2">
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-blue-500 [animation-delay:0ms] dark:bg-blue-400" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-blue-500 [animation-delay:150ms] dark:bg-blue-400" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-blue-500 [animation-delay:300ms] dark:bg-blue-400" />
+                    <div className="flex items-center gap-1.5 rounded-2xl border border-red-500/20 bg-red-500/5 px-3 py-2">
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-[#ff1e42] [animation-delay:0ms]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-[#ff1e42] [animation-delay:150ms]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-[#ff1e42] [animation-delay:300ms]" />
                     </div>
                   </div>
                 )}
                 <div ref={endRef} />
               </div>
             </main>
-            <footer className="px-4 pb-4">
-              <div className="mx-auto max-w-3xl space-y-2">
+            <footer className="border-t border-red-500/20 bg-[#0a0304] px-4 pb-4 pt-3">
+              <div className="mx-auto max-w-3xl space-y-2 rounded-2xl border border-red-500/20 bg-[#0a0304]/60 p-1 shadow-[0_0_30px_rgba(255,30,66,0.1)]">
                 <PromptBar
                   onSend={(t) => send(t)}
                   loading={loading}
