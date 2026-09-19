@@ -8,14 +8,36 @@ import RavineBackground from './components/RavineBackground';
 import DailyVerse from './components/DailyVerse';
 import { loadChats, saveChats, loadTheme, saveTheme, createChat } from './lib/storage';
 import { PROVIDERS } from './lib/models';
-import { owner } from './lib/owner';
+
+// Sapaan landing: acak setiap refresh, kalimat evening hanya sore/malam.
+const GREETINGS_ANYTIME = [
+  'Hey Daniel! Ready to turn some ideas into reality?',
+  'Welcome back Daniel! How can I assist you with your projects today?',
+  'Hi Daniel! Let\u2019s get things done. What shall we work on?',
+  'Good to see you, Daniel! What\u2019s on your mind today?',
+  'Hello Daniel! System\u2019s ready whenever you are. What\u2019s the focus?',
+  'Hey Daniel! How can I make your workload lighter today?',
+  'Welcome Daniel! Ready to crush today\u2019s goals together?',
+];
+
+const GREETINGS_EVENING = [
+  'Good evening Daniel! What are we diving into tonight?',
+  'Evening, Daniel! What\u2019s top priority on your list right now?',
+  'Evening Daniel! Need help brainstorming, drafting, or troubleshooting?',
+];
 
 function greeting() {
-  const firstName = (owner.name || '').split(' ')[0] || '';
+  const h = new Date().getHours();
+  const pool = h >= 15 ? [...GREETINGS_ANYTIME, ...GREETINGS_EVENING] : GREETINGS_ANYTIME;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// Sapaan pertama tiap buka tab: berbasis waktu (Good morning/afternoon/evening/night Daniel).
+function greetingTimeBased() {
   const h = new Date().getHours();
   const base =
     h < 11 ? 'Good morning' : h < 15 ? 'Good afternoon' : h < 19 ? 'Good evening' : 'Good night';
-  return firstName ? `${base} ${firstName}` : base;
+  return `${base} Daniel`;
 }
 
 // Info waktu lokal user (Bahasa Inggris) untuk dikirim ke AI.
@@ -70,7 +92,14 @@ export default function PersonalAssistant() {
       // pertahankan default 'dark'
     }
     try {
-      setGreet(greeting());
+      // Buka tab baru = sapaan waktu; refresh berikutnya = acak (flag per session).
+      const seen = sessionStorage.getItem('pa-greet-first');
+      if (seen) {
+        setGreet(greeting());
+      } else {
+        setGreet(greetingTimeBased());
+        sessionStorage.setItem('pa-greet-first', '1');
+      }
     } catch {
       // pertahankan default 'Halo'
     }
@@ -356,10 +385,10 @@ export default function PersonalAssistant() {
             <div className="mb-6">
               <LynnAI state={blobState} />
             </div>
-            <h1 className="mb-6 bg-gradient-to-r from-red-600 via-[#ff1e42] to-red-500 bg-clip-text px-2 text-center text-2xl font-medium text-transparent sm:text-3xl dark:from-red-200 dark:via-[#ff1e42] dark:to-red-500">
-              {greet}, how can I help you today?
+            <h1 className="mb-6 bg-gradient-to-r from-red-600 via-[#ff1e42] to-red-500 bg-clip-text px-2 text-center text-xl font-medium text-transparent sm:text-[26px] dark:from-red-200 dark:via-[#ff1e42] dark:to-red-500">
+              {greet}
             </h1>
-            <div className="w-full max-w-2xl rounded-2xl border border-red-200 bg-white/70 p-1 shadow-[0_0_40px_rgba(255,30,66,0.12)] backdrop-blur-md dark:border-red-500/20 dark:bg-[#0a0304]/60">
+            <div className="w-full max-w-2xl rounded-full border border-red-200 bg-white/70 p-1 shadow-[0_0_40px_rgba(255,30,66,0.12)] backdrop-blur-md dark:border-red-500/20 dark:bg-[#0a0304]/60">
               <PromptBar
                 onSend={(t) => send(t)}
                 loading={loading}
@@ -405,7 +434,7 @@ export default function PersonalAssistant() {
               </div>
             </main>
             <footer className="border-t border-red-200 bg-white px-4 pb-4 pt-3 dark:border-red-500/20 dark:bg-[#0a0304]">
-              <div className="mx-auto max-w-3xl space-y-2 rounded-2xl border border-red-200 bg-white/70 p-1 shadow-[0_0_30px_rgba(255,30,66,0.1)] dark:border-red-500/20 dark:bg-[#0a0304]/60">
+              <div className="mx-auto max-w-3xl space-y-2 rounded-full border border-red-200 bg-white/70 p-1 shadow-[0_0_30px_rgba(255,30,66,0.1)] dark:border-red-500/20 dark:bg-[#0a0304]/60">
                 <PromptBar
                   onSend={(t) => send(t)}
                   loading={loading}

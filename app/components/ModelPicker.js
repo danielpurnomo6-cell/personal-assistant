@@ -2,10 +2,21 @@
 import { useEffect } from 'react';
 import { PROVIDERS, EFFORT_LEVELS } from '../lib/models';
 
+// Nama pendek untuk tombol trigger (versi model lengkap tetap tampil di dropdown).
+const SHORT_NAMES = {
+  gemini: 'Gemini',
+  'gpt-mini': 'ChatGPT',
+  claude: 'Claude',
+  deepseek: 'DeepSeek',
+  'qwen-coder': 'Qwen',
+  gemma: 'Gemma',
+};
+
 // Composer model picker ala AI Chat 9:
 // daftar provider + kartu detail (konteks, biaya) + kontrol reasoning effort.
 export default function ModelPicker({ providerId, effort, onProviderChange, onEffortChange, open, onToggle, onClose }) {
   const active = PROVIDERS.find((p) => p.id === providerId) || PROVIDERS[0];
+  const shortName = SHORT_NAMES[active.id] || active.name;
   const activeEffort = EFFORT_LEVELS.find((e) => e.id === effort) || EFFORT_LEVELS[1];
 
   useEffect(() => {
@@ -18,7 +29,7 @@ export default function ModelPicker({ providerId, effort, onProviderChange, onEf
   }, [open, onClose]);
 
   return (
-    <div className="relative">
+    <div className="relative shrink-0">
       <button
         onClick={onToggle}
         aria-label="Pilih model"
@@ -26,7 +37,7 @@ export default function ModelPicker({ providerId, effort, onProviderChange, onEf
         className="ml-1 flex items-center gap-1.5 rounded-full px-2 py-1 text-xs text-neutral-500 transition hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-800"
       >
         <span className="h-2 w-2 rounded-full bg-gradient-to-br from-red-900 via-[#ff1e42] to-red-400 shadow-[0_0_8px_rgba(255,30,66,0.7)]" />
-        <span className="hidden max-w-[140px] truncate sm:block">{active.model}</span>
+        <span className="max-w-[140px] truncate">{shortName}</span>
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -41,7 +52,7 @@ export default function ModelPicker({ providerId, effort, onProviderChange, onEf
       {open && (
         <>
           <div className="fixed inset-0 z-40 cursor-default" onClick={onClose} />
-          <div className="absolute bottom-full left-0 z-50 mb-2 max-h-[min(60vh,360px)] w-[260px] max-w-[calc(100vw-3rem)] overflow-y-auto rounded-xl border border-neutral-200 bg-white p-1.5 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="absolute bottom-full right-0 z-50 mb-2 max-h-[min(60vh,360px)] w-[260px] max-w-[calc(100vw-3rem)] overflow-y-auto rounded-xl border border-neutral-200 bg-white p-1.5 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
             <p className="px-2 pb-1 pt-1 text-[11px] font-medium uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
               Model
             </p>

@@ -44,15 +44,12 @@ export function verseForDate(d = new Date()) {
 export default function DailyVerse({ date } = {}) {
   const verse = verseForDate(date instanceof Date ? date : new Date());
   return (
-    <div className="rounded-xl border border-red-200 bg-white/70 px-5 py-4 text-center shadow-[0_0_24px_rgba(255,30,66,0.08)] backdrop-blur-md dark:border-red-500/20 dark:bg-[#0a0304]/70">
-      <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-red-600 dark:text-red-400">
-        Today Verse
+    <div className="rounded-xl border border-red-200 bg-white/70 px-5 py-3 text-center shadow-[0_0_24px_rgba(255,30,66,0.08)] backdrop-blur-md dark:border-red-500/20 dark:bg-[#0a0304]/70">
+      <p className="mb-1 text-center text-[11px] font-semibold text-red-600 dark:text-red-400">
+        {verse.ref} <span className="font-normal opacity-70">(TB)</span>
       </p>
-      <p className="text-sm italic leading-relaxed text-neutral-700 dark:text-red-100/80">
+      <p className="text-xs italic leading-relaxed text-neutral-700 dark:text-red-100/80">
         &ldquo;{verse.text}&rdquo;
-      </p>
-      <p className="mt-2 text-xs font-medium text-red-500/80 dark:text-red-300/60">
-        {verse.ref} (TB)
       </p>
     </div>
   );
