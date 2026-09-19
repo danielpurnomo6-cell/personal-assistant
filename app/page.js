@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Sidebar from './components/Sidebar';
 import PromptBar from './components/PromptBar';
 import Message from './components/Message';
-import LynnCore from './components/LynnCore';
+import LynnAI from './components/LynnAI';
 import RavineBackground from './components/RavineBackground';
 import DailyVerse from './components/DailyVerse';
 import { loadChats, saveChats, loadTheme, saveTheme, createChat } from './lib/storage';
@@ -40,13 +40,6 @@ function getTimeInfo() {
   };
 }
 
-const QUICK_ACTIONS = [
-  { label: 'Bantu koding', prompt: 'Bantu saya koding: jelaskan langkahnya dengan jelas dan beri contoh kode.' },
-  { label: 'Rencanakan hariku', prompt: 'Bantu rencanakan hariku hari ini dengan prioritas yang jelas.' },
-  { label: 'Tulis naskah video', prompt: 'Bantu tulis naskah video pendek yang hook-nya kuat di 3 detik pertama.' },
-  { label: 'Brainstorm ide', prompt: 'Beri saya 5 ide kreatif yang bisa saya eksekusi minggu ini.' },
-];
-
 export default function PersonalAssistant() {
   const router = useRouter();
   // Nilai awal KONSTAN agar render server & hydration pertama identik
@@ -63,6 +56,8 @@ export default function PersonalAssistant() {
   const abortRef = useRef(null);
   const endRef = useRef(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [talking, setTalking] = useState(false);
+  const talkingTimer = useRef(null);
 
   // Muat state persisten (localStorage) sekali setelah mount.
   useEffect(() => {
@@ -172,6 +167,25 @@ export default function PersonalAssistant() {
     [chats, activeId]
   );
   const isLanding = messages.length === 0;
+
+  // TALKING: aktif sesaat setelah pesan AI masuk agar blob terlihat "berbicara".
+  useEffect(() => {
+    const last = messages[messages.length - 1];
+    if (last?.role === 'assistant') {
+      setTalking(true);
+      if (talkingTimer.current) clearTimeout(talkingTimer.current);
+      // Durasi elastis proporsional panjang jawaban (4–10 detik).
+      const dur = Math.min(10000, Math.max(4000, (last.content?.length || 200) * 12));
+      talkingTimer.current = setTimeout(() => setTalking(false), dur);
+    }
+    return () => {
+      if (talkingTimer.current) clearTimeout(talkingTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length]);
+
+  // State blob: THINKING saat loading, TALKING sesaat setelah AI menjawab, IDLE selebihnya.
+  const blobState = loading ? 'thinking' : talking ? 'talking' : 'idle';
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -315,7 +329,7 @@ export default function PersonalAssistant() {
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Header — LYNN // PROTOCOL RED */}
+        {/* Header */}
         <header className="flex items-center gap-1 border-b border-red-500/20 bg-[#0a0304]/80 px-3 py-2.5 backdrop-blur-md">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
@@ -326,15 +340,6 @@ export default function PersonalAssistant() {
               <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           </button>
-          <div className="flex min-w-0 flex-col leading-tight">
-            <span className="truncate text-sm font-semibold tracking-[0.2em] text-red-100">
-              LYNN <span className="text-red-500">{'//'}</span> PROTOCOL RED
-            </span>
-            <span className="flex items-center gap-1.5 text-[11px] font-medium tracking-widest text-red-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#ff1e42] shadow-[0_0_8px_rgba(255,30,66,0.9)] animate-lynn-blink" />
-              SYSTEM ONLINE
-            </span>
-          </div>
           <div className="flex-1" />
           <button
             onClick={toggleTheme}
@@ -380,12 +385,8 @@ export default function PersonalAssistant() {
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,30,66,0.12),transparent_60%)]" />
             <div className="relative z-10 flex w-full flex-col items-center">
             <div className="mb-6">
-              <LynnCore state={loading ? 'loading' : 'idle'} />
+              <LynnAI state={blobState} />
             </div>
-            <p className="mb-2 flex items-center gap-1.5 text-[11px] font-medium tracking-[0.3em] text-red-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#ff1e42] shadow-[0_0_8px_rgba(255,30,66,0.9)] animate-lynn-blink" />
-              LYNN {'//'} PROTOCOL RED — SYSTEM ONLINE
-            </p>
             <h1 className="mb-6 bg-gradient-to-r from-red-200 via-[#ff1e42] to-red-500 bg-clip-text px-2 text-center text-2xl font-medium text-transparent sm:text-3xl">
               {greet}, how can I help you today?
             </h1>
@@ -400,18 +401,6 @@ export default function PersonalAssistant() {
                 onEffortChange={changeEffort}
                 placeholder="Minta bantuan LYNN..."
               />
-            </div>
-            <div className="mt-4 flex w-full max-w-2xl flex-wrap justify-center gap-2">
-              {QUICK_ACTIONS.map((a) => (
-                <button
-                  key={a.label}
-                  onClick={() => send(a.prompt)}
-                  disabled={loading}
-                  className="rounded-full border border-[#ef4444]/40 bg-red-500/5 px-3.5 py-1.5 text-xs font-medium text-red-200 transition hover:border-[#ff1e42] hover:bg-red-500/15 hover:shadow-[0_0_16px_rgba(255,30,66,0.35)] disabled:opacity-40"
-                >
-                  {a.label}
-                </button>
-              ))}
             </div>
             <div className="mt-6 w-full max-w-2xl">
               <DailyVerse />
