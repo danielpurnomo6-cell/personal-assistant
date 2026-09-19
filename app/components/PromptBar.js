@@ -5,7 +5,7 @@ import ModelPicker from './ModelPicker';
 const MAX_FILE_CHARS = 20000;
 
 // Prompt bar ala Gemini: bentuk pil, tombol +, mic, kirim/stop dinamis.
-export default function PromptBar({ onSend, loading, onStop, providerId, effort, onProviderChange, onEffortChange, placeholder = 'Tanyakan sesuatu...' }) {
+export default function PromptBar({ onSend, loading, onStop, providerId, effort, onProviderChange, onEffortChange, placeholder = 'Ask Lynn...' }) {
   const [input, setInput] = useState('');
   const [attached, setAttached] = useState([]);
   const [listening, setListening] = useState(false);
@@ -104,7 +104,7 @@ export default function PromptBar({ onSend, loading, onStop, providerId, effort,
   };
 
   return (
-    <div className="rounded-xl border border-red-500/20 bg-[#0a0304]/80 shadow-[0_0_24px_rgba(255,30,66,0.08)] backdrop-blur-md transition focus-within:border-[#ff1e42]/60 focus-within:shadow-[0_0_24px_rgba(255,30,66,0.2)]">
+    <div className="rounded-xl border border-red-200 bg-white/80 shadow-[0_0_24px_rgba(255,30,66,0.08)] backdrop-blur-md transition focus-within:border-[#ff1e42]/60 focus-within:shadow-[0_0_24px_rgba(255,30,66,0.2)] dark:border-red-500/20 dark:bg-[#0a0304]/80">
       {attached.length > 0 && (
         <div className="flex flex-wrap gap-2 px-4 pt-3">
           {attached.map((f, i) => (
@@ -134,7 +134,7 @@ export default function PromptBar({ onSend, loading, onStop, providerId, effort,
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className="max-h-[200px] w-full resize-none bg-transparent px-5 pb-1 pt-4 text-[15px] leading-relaxed text-red-50 outline-none placeholder:text-red-200/30"
+        className="max-h-[200px] w-full resize-none bg-transparent px-5 pb-1 pt-4 text-[15px] leading-relaxed text-neutral-900 outline-none placeholder:text-neutral-400 dark:text-red-50 dark:placeholder:text-red-200/30"
       />
 
       <div className="flex items-center gap-1 px-3 pb-3">

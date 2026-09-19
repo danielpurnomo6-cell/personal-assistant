@@ -88,7 +88,7 @@ export default function Message({ msg, isLastAssistant, onRegenerate, loading })
     return (
       <div className="flex justify-end">
         <div className="max-w-[85%]">
-          <div className="whitespace-pre-wrap rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm leading-relaxed text-red-50 shadow-[0_0_20px_rgba(255,30,66,0.08)]">
+          <div className="whitespace-pre-wrap rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm leading-relaxed text-red-950 shadow-[0_0_20px_rgba(255,30,66,0.08)] dark:text-red-50">
             {rawContent}
           </div>
           {msg.ts && (
@@ -107,7 +107,7 @@ export default function Message({ msg, isLastAssistant, onRegenerate, loading })
         <span className="h-2 w-2 rounded-full bg-white animate-lynn-blink" />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-[15px] leading-[1.75] text-neutral-200">
+        <div className="text-[15px] leading-[1.75] text-neutral-800 dark:text-neutral-200">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
             {text}
           </ReactMarkdown>

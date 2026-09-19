@@ -1,6 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
-import BlobCursor from "./components/BlobCursor";
 import "./globals.css";
 
 // Font sans utama: Geist (variable font, direkomendasikan docs Next 16).
@@ -27,13 +26,12 @@ export default function RootLayout({ children }) {
     <html
       lang="id"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Script id="theme-init" strategy="beforeInteractive">
           {themeScript}
         </Script>
-        <BlobCursor />
         {children}
       </body>
     </html>

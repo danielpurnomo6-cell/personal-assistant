@@ -31,7 +31,7 @@ const NAV = [
   },
   {
     href: '/catatan',
-    label: 'Catatan',
+    label: 'Eagle School',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={ICON_CLS}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h8l4 4v14H7zM15 3v4h4M10 13h5M10 17h5" />
@@ -81,7 +81,7 @@ export default function Sidebar({
         />
       )}
       <aside
-        className={`z-40 flex w-72 shrink-0 flex-col border-r border-red-500/20 bg-[#0a0304] text-neutral-200 transition-transform duration-200 fixed inset-y-0 left-0 md:static ${
+        className={`z-40 flex w-72 shrink-0 flex-col border-r border-red-200 bg-white text-neutral-900 transition-transform duration-200 fixed inset-y-0 left-0 md:static dark:border-red-500/20 dark:bg-[#0a0304] dark:text-neutral-200 ${
           open ? 'translate-x-0' : '-translate-x-full md:hidden'
         }`}
       >
